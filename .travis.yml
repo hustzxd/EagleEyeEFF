@@ -1,0 +1,16 @@
+language: python
+sudo: required
+python:
+- '3.6'
+
+#branchs:
+#  only:
+#  - master
+install:
+- pip install -r requirements.txt
+
+before_script:
+- export PYTHONPATH=$PYTHONPATH:`pwd`
+
+script:
+- pytest test/

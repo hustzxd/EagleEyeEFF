@@ -1,0 +1,65 @@
+main_file: "examples/classifier_cifar10/main_eagle_eye.py"
+arch: "cifar10_vggsmall"
+model_source: Local
+
+log_name: "eagleflops0.1TTT"
+debug: true
+data: "/workspace/datasets/data.cifar10"
+lr: 0.01
+epochs: 10
+batch_size: 256
+workers: 8
+print_freq: 100
+evaluate: false
+pretrained: true # rethinking pruning
+seed: 1
+gpu_id: ANY
+export_onnx: false
+
+rcp {
+  flops_pruned: 0.9
+  rank_type: L1Norm # use L1 norm rank
+  ada {
+    maxiter: 10
+    step: 0.02
+    max_sparsity: 0.9
+    min_sparsity: 0.0
+    search_type: Evolution
+    best_queue_size: 5
+  }
+}
+
+lr_scheduler: CosineAnnealingLR
+
+optimizer: SGD
+sgd {
+  weight_decay: 1e-4
+  momentum: 0.9
+}
+
+replace_layer_map {
+  layer {
+    name: "features.0"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "features.3"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "features.7"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "features.10"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "features.14"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "features.17"
+    type: "Conv2dCP"
+  }
+}

@@ -1,0 +1,97 @@
+main_file: "examples/classifier_imagenet/main_eagle_eye.py"
+arch: "mobilenetv1"
+model_source: Local
+log_name: "EagleEyeOri0.5TTTT"
+debug: false
+data: "/workspace/datasets/data.imagenet"
+lr: 0.01
+epochs: 120
+batch_size: 64
+workers: 16
+print_freq: 100
+evaluate: false
+pretrained: true
+seed: 1
+gpu_id: ANY
+
+rcp {
+  channel_sparsity: 0.50
+  flops_pruned: 0.50
+  rank_type: L1Norm # use L1 norm rank
+  # freeze_sparsity: "sparsity_config/mbv1_flops0.5_eagle_eye.txt"
+  ada {
+    maxiter: 1000
+    step: 0.02
+    max_sparsity: 0.7
+    min_sparsity: 0.0
+    search_type: Evolution
+    best_queue_size: 5
+  }
+}
+
+lr_scheduler: CosineAnnealingLR
+
+optimizer: SGD
+sgd {
+  weight_decay: 9.999999747378752e-05
+  momentum: 0.8999999761581421
+}
+
+replace_layer_map {
+  layer {
+    name: "conv1"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layers.0.conv2"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layers.1.conv2"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layers.2.conv2"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layers.3.conv2"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layers.4.conv2"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layers.5.conv2"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layers.6.conv2"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layers.7.conv2"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layers.8.conv2"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layers.9.conv2"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layers.10.conv2"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layers.11.conv2"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layers.12.conv2"
+    type: "Conv2dCP"
+  }
+}

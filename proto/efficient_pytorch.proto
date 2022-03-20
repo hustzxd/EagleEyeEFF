@@ -1,0 +1,251 @@
+syntax = "proto2";
+
+package efficient_pytorch;
+
+message HyperParam {
+    optional string main_file = 1 [default="examples/classifier_imagenet/main.py"];
+    optional string arch = 2 [default="alexnet"];
+    optional ModelSource model_source = 3;
+    enum ModelSource {
+        TorchVision = 1;
+        PyTorchCV = 2;
+        Local = 3;
+    }
+    optional string log_name = 4 [default="template"];
+    // path to dataset
+    required string data = 5;
+
+    // debug mode, record detailed information. 
+    optional bool debug = 6;
+    // train and validate with one batch for overfit testing.
+    optional bool overfit_test = 7;
+
+    // send wechat
+    optional bool send_wechat = 8;
+
+    // initial learning rate
+    optional float lr = 10 [default=0.1];
+    // number of total epochs to run
+    optional int32 epochs = 11 [default=90];
+    // mini-batch size (default: 256), this is the total '
+    //     'batch size of all GPUs on the current node when '
+    //     'using Data Parallel or Distributed Data Parallel
+    optional int32 batch_size = 12 [default=256];
+    // number of data loading workers (default: 4)
+    optional int32 workers = 13 [default=4];
+    // print frequency (default: 50)
+    optional int32 print_freq = 14 [default=50];
+    // evaluate model on validation set
+    optional bool evaluate = 15;
+    // use pre-trained model
+    optional bool pretrained = 16;
+
+    // seed for initializing training.
+    optional int32 seed = 17;
+    // whether to export as onnx format.
+    optional bool export_onnx = 18;
+
+    // resume from previous checkpoint.
+    optional string resume = 19;
+    // weight
+    optional string weight = 22;
+
+    // gpu id
+    optional GPU gpu_id = 20;
+    // muti_gpu setting
+    optional MultiGPU multi_gpu = 21;
+
+    // Quantization modes
+    optional Qmode qmode = 50;
+    optional int32 nbits_w = 51[default=4];
+    optional int32 nbits_a = 52[default=4];
+
+    optional Warmup warmup = 99;
+    optional LRScheduleType lr_scheduler = 100;
+
+    optional StepLRParam step_lr = 101;
+    optional MultiStepLRParam multi_step_lr = 102;
+    optional CyclicLRParam cyclic_lr = 103;
+
+    optional OptimizerType optimizer = 200;
+    optional SGDParam sgd = 201;
+    optional AdamParam adam = 202;
+    // TODO: add other hyper-parameter
+    optional ReplaceLayerMap replace_layer_map = 300;
+    optional RCP rcp = 500; // random selected channel pruning
+}
+
+message ReplaceLayerMap {
+    message Layer {
+        repeated string name = 1;
+        optional string type = 2[default="Conv2D"];
+        optional string param = 3[default="None"];
+    }
+    repeated Layer layer = 1;
+}
+
+
+message RCP {
+    optional float channel_sparsity = 1[default=0]; // sparse ratio for channel
+    optional float flops_pruned = 2[default=0.5];
+    // optional DEParam de = 3;
+    optional RankType rank_type = 3; // use random or L1 norm rank
+    enum RankType {
+        L1Norm = 1;
+        Random = 2; 
+    }
+    optional AdaParam ada = 4; // search per layer sparsity
+    optional string freeze_sparsity = 5;
+    message AdaParam { // random search
+        optional int32 maxiter = 1[default=10];
+        optional float step = 2[default=0.05];
+        optional float max_sparsity = 3[default=0.8];
+        optional float min_sparsity = 4[default=0.0];
+        optional SearchType search_type = 5;
+        optional int32 best_queue_size = 6[default=10];
+
+        enum SearchType {
+            Evolution = 1; // simple evolution search algorithm
+            Random = 2;   // random search
+        }
+    }
+}
+
+
+enum GPU {
+    ANY = 1;  // use any GPU
+    NONE = 2; // use cpu
+}
+
+enum Qmode{
+    // Quantization modes
+    layer_wise = 1;
+    // kernel or channel wise
+    kernel_wise = 2;
+}
+
+message MultiGPU {
+    // number of nodes for distributed training
+    optional int32 world_size = 1 [default=-1];
+    // ode rank for distributed training
+    optional int32 rank = 2 [default=0];
+    // url used to set up distributed training
+    optional string dist_url = 3 [default="tcp://127.0.0.1:23456"];
+    // distributed backend
+    optional string dist_backend = 4 [default="nccl"];
+    // Use multi-processing distributed training to launch
+    // N processes per node, which has N GPUs. This is the
+    // fastest way to use PyTorch for either single node or
+    // multi node data parallel training
+    optional bool multiprocessing_distributed = 5;
+}
+
+
+enum OptimizerType {
+    SGD = 1;
+    Adam = 2;
+    // TODO: more other optimizer
+}
+
+message SGDParam {
+    optional float weight_decay = 1 [default=1e-4];
+    optional float momentum = 2 [default=0.9];
+}
+
+message AdamParam {
+    optional float weight_decay = 1 [default=1e-4];
+}
+
+enum LRScheduleType {
+    StepLR = 1;
+    MultiStepLR = 2;
+    CosineAnnealingLR = 3;
+    CyclicLR = 4;
+}
+
+message Warmup {
+    // warm up epoch
+    optional int32 epochs = 1 [default=10];
+    // warm up multiplier
+    optional float multiplier = 2 [default=10];
+}
+
+message StepLRParam {
+    // step size of StepLR
+    optional int32 step_size = 3 [default=20];
+    // lr decay of StepLR
+    optional float gamma = 4 [default=0.1];
+}
+
+message MultiStepLRParam {
+    // milestones of MultiStepLR
+    repeated int32 milestones = 3;
+    // lr decay of MultiStepLR
+    optional float gamma = 4 [default=0.1];
+}
+
+
+message CyclicLRParam {
+    // 在使用时，原始的CLR是按照 batch iteration 的更新 lr 的，本项目中为了和之前的几个LR统一，
+    // 使用了 epoch iteration 来进行更新 lr
+    // base_lr (float or list): Initial learning rate which is the
+    //   lower boundary in the cycle for each parameter group.
+    optional float base_lr = 1;
+    // max_lr (float or list): Upper learning rate boundaries in the cycle
+    //         for each parameter group. Functionally,
+    //         it defines the cycle amplitude (max_lr - base_lr).
+    //         The lr at any cycle is the sum of base_lr
+    //         and some scaling of the amplitude; therefore
+    //         max_lr may not actually be reached depending on
+    //         scaling function.
+    optional float max_lr = 2;
+    //     step_size_up (int): Number of training iterations in the
+    //         increasing half of a cycle. Default: 2000
+    optional int32 step_size_up = 3 [default=2000];
+    //     step_size_down (int): Number of training iterations in the
+    //         decreasing half of a cycle. If step_size_down is None,
+    //         it is set to step_size_up. Default: None
+    optional int32 step_size_down = 4;
+    //     mode (str): One of {triangular, triangular2, exp_range}.
+    //         Values correspond to policies detailed above.
+    //         If scale_fn is not None, this argument is ignored.
+    //         Default: 'triangular'
+    optional Mode mode = 5;
+    enum Mode {
+        triangular = 1;
+        triangular2 = 2;
+        exp_range = 3;
+    }
+    //     gamma (float): Constant in 'exp_range' scaling function:
+    //         gamma**(cycle iterations)
+    //         Default: 1.0
+    optional float gamma = 6 [default=1.0];
+    //     scale_fn (function): Custom scaling policy defined by a single
+    //         argument lambda function, where
+    //         0 <= scale_fn(x) <= 1 for all x >= 0.
+    //         If specified, then 'mode' is ignored.
+    //         Default: None
+    //     scale_mode (str): {'cycle', 'iterations'}.
+    //         Defines whether scale_fn is evaluated on
+    //         cycle number or cycle iterations (training
+    //         iterations since start of cycle).
+    //         Default: 'cycle'
+    //     cycle_momentum (bool): If ``True``, momentum is cycled inversely
+    //         to learning rate between 'base_momentum' and 'max_momentum'.
+    //         Default: True
+    //     base_momentum (float or list): Lower momentum boundaries in the cycle
+    //         for each parameter group. Note that momentum is cycled inversely
+    //         to learning rate; at the peak of a cycle, momentum is
+    //         'base_momentum' and learning rate is 'max_lr'.
+    //         Default: 0.8
+    //     max_momentum (float or list): Upper momentum boundaries in the cycle
+    //         for each parameter group. Functionally,
+    //         it defines the cycle amplitude (max_momentum - base_momentum).
+    //         The momentum at any cycle is the difference of max_momentum
+    //         and some scaling of the amplitude; therefore
+    //         base_momentum may not actually be reached depending on
+    //         scaling function. Note that momentum is cycled inversely
+    //         to learning rate; at the start of a cycle, momentum is 'max_momentum'
+    //         and learning rate is 'base_lr'
+    //         Default: 0.9
+}

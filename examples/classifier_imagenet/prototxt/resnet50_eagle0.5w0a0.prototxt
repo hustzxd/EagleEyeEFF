@@ -1,0 +1,207 @@
+main_file: "examples/classifier_imagenet/main_eagle_eye.py"
+arch: "resnet50"
+model_source: TorchVision
+log_name: "EagleEyeOri0.5TTTTTT"
+debug: false
+data: "/workspace/datasets/data.imagenet"
+lr: 0.01
+epochs: 120
+batch_size: 128
+workers: 16
+print_freq: 100
+evaluate: false
+pretrained: true
+seed: 1
+gpu_id: ANY
+
+
+rcp {
+  flops_pruned: 0.50
+  rank_type: L1Norm # use L1 norm rank
+  freeze_sparsity: "sparsity_config/res50_flops25_eagle_eye.txt"
+  # ada {
+  #   maxiter: 1000
+  #   step: 0.02
+  #   max_sparsity: 0.7
+  #   min_sparsity: 0.0
+  #   search_type: Evolution
+  #   best_queue_size: 5
+  # }
+}
+
+lr_scheduler: CosineAnnealingLR
+
+optimizer: SGD
+sgd {
+  weight_decay: 9.999999747378752e-05
+  momentum: 0.8999999761581421
+}
+
+replace_layer_map {
+  layer {
+    name: "conv1"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layer1.0.conv1"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layer1.0.conv2"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layer1.1.conv1"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layer1.1.conv2"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layer1.2.conv1"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layer1.2.conv2"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layer1.0.conv3" # leader
+    name: "layer1.1.conv3"
+    name: "layer1.2.conv3", 
+    name: "layer1.0.downsample.0"
+    type: "Conv2dCP"
+  }
+
+  layer {
+    name: "layer2.0.conv1"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layer2.0.conv2"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layer2.1.conv1"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layer2.1.conv2"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layer2.2.conv1"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layer2.2.conv2"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layer2.3.conv1"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layer2.3.conv2"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layer2.0.conv3"
+    name: "layer2.1.conv3"
+    name: "layer2.2.conv3"
+    name: "layer2.3.conv3"
+    name: "layer2.0.downsample.0"
+    type: "Conv2dCP"
+  }
+
+  layer {
+    name: "layer3.0.conv1"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layer3.0.conv2"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layer3.1.conv1"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layer3.1.conv2"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layer3.2.conv1"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layer3.2.conv2"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layer3.3.conv1"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layer3.3.conv2"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layer3.4.conv1"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layer3.4.conv2"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layer3.5.conv1"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layer3.5.conv2"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layer3.0.conv3"
+    name: "layer3.1.conv3"
+    name: "layer3.2.conv3"
+    name: "layer3.3.conv3"
+    name: "layer3.4.conv3"
+    name: "layer3.5.conv3"
+    name: "layer3.0.downsample.0"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layer4.0.conv1"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layer4.0.conv2"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layer4.1.conv1"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layer4.1.conv2"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layer4.2.conv1"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layer4.2.conv2"
+    type: "Conv2dCP"
+  }
+  layer {
+    name: "layer4.0.conv3"
+    name: "layer4.1.conv3"
+    name: "layer4.2.conv3"
+    name: "layer4.0.downsample.0"
+    type: "Conv2dCP"
+  }
+}
