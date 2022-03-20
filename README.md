@@ -22,5 +22,6 @@ docker exec -it [container:id] /bin/bash
 
 ```bash
 ./run_cli.sh examples/classifier_cifar10/prototxt/vggsmall_eagle0.9.prototxt
-
+./run_cli.sh examples/classifier_imagenet/prototxt/resnet50_eagle0.5w0a0.prototxt
+./run_cli.sh examples/classifier_imagenet/prototxt/mobilenetv1_eagle0.5w0a0.prototxt
 ```
