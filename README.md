@@ -14,7 +14,7 @@ pip install -r requirements.txt
 ## Docker
 ```bash
 docker build docker/ -t efftorch:torch1.10.0
-docker run -itd -v [datasets]:/workspace/datasets -v [datasets]:/workspace/EfficientPyTorchPri --gpus all --ipc=host --name efftorch -p 2727:22 [images:id]
+docker run -itd -v [datasets]:/workspace/datasets -v [repo]:/workspace/EagleEyeEFF --gpus all --ipc=host --name efftorch [images:id]
 docker exec -it [container:id] /bin/bash
 ```
 
