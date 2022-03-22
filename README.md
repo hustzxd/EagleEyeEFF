@@ -1,6 +1,13 @@
 
 # EfficientPyTorch
 
+- [x] This is an implementation of channel pruning using the latest `torch.FX` feature.
+- [x] This is also a reimplementation of the paper `EagleEye: Fast Sub-net Evaluation for Efficient Neural Network Pruning`.
+  - [x] A [modification](https://github.com/hustzxd/EagleEyeEFF/blob/c2909ae27e4f5e62068ab60612bf463adbcba136/examples/classifier_imagenet/prototxt/resnet50_eagle0.5w0a0.prototxt#L27) to random search to make the search process more stable.
+## References
+1. https://github.com/anonymous47823493/EagleEye
+2. https://github.com/IntelLabs/distiller
+
 ## Install
 ```bash
 git clone https://github.com/hustzxd/EagleEyeEFF.git
