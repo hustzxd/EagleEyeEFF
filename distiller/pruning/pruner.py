@@ -179,7 +179,7 @@ def prune_channel(
         if issubclass(fx_graph.get_node_module_type(node), nn.Linear):
             cur_fc = node
             # pre_fc = TODO if there are multiple fc layers.
-            pre_conv = fx_graph.get_pre_conv(cur_bn)
+            pre_conv = fx_graph.get_pre_conv(cur_fc)
             if pre_conv is not None:  # prune bn according to pre conv
                 pre_conv_module = fx_graph.get_node_module(pre_conv)
                 cur_fc_module = fx_graph.get_node_module(cur_fc)
